@@ -1,3 +1,5 @@
+--A lengthy query with multiple JOIN clauses to show competency in SQL--
+
 select 
 	ord.order_id, 
 	concat(cus.first_name, ' ', cus.last_name) as customers, 
