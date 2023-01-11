@@ -1,0 +1,81 @@
+---Find order details made by Jill and Eva.
+Consider the Jill and Eva as first names of customers.
+Output the order date, details and cost along with the first name.
+Order records based on the customer id in ascending order.--
+
+select o.order_date, o.order_details, o.total_order_cost, c.first_name
+from customers c
+inner join orders o
+on c.id = o.cust_id
+where c.first_name in ('Jill', 'Eva')
+order by o.cust_id
+
+
+
+
+---You're given a dataset of health inspections. Count the number 
+of violation in an inspection in 'Roxanne Cafe' for each year.
+If an inspection resulted in a violation, there will be a value in the 'violation_id'
+column.Output the number of violations by year in ascending order--
+
+select extract(year
+            from inspection_date :: DATE) as year,
+            count(*) as num_inspections
+from sf_restaurant_health_violations
+where business_name = 'Roxanne Cafe'
+group by year
+order by year
+
+
+
+
+---Classify each business as either a restaurant, cafe, school, or other.
+•	A restaurant should have the word 'restaurant' in the business name.
+•	A cafe should have either 'cafe', 'café', or 'coffee' in the business name.
+•	A school should have the word 'school' in the business name.
+•	All other businesses should be classified as 'other'.
+Output the business name and their classification.--
+
+select  distinct business_name,
+    case
+        when business_name ilike any(array['%school%'])
+        then 'school'
+        when lower(business_name) like any (array['%restaurant%'])
+        then 'restaurant'
+        when lower(business_name) like any (array['%cafe%','%café%', '%coffee%'])
+        then 'cafe'
+    else 'other'
+end as business_type
+from sf_restaurant_health_violations
+
+
+
+
+---Find all wineries which produce wines by possessing aromas of plum, cherry, rose, or hazelnut. To make it more simple, look only for singular form of the mentioned aromas.
+Example Description: Hot, tannic and simple, with cherry jam and currant flavors accompanied by high, tart acidity and chile-pepper alcohol heat.
+Therefore the winery Bella Piazza is expected in the results.--
+
+select distinct winery 
+from winemag_p1
+where lower(description) ~ '\y(plum|cherry|rose|hazelnut)\y'
+
+
+
+---Find the customer with the highest daily total order cost between 2019-02-01 to 2019-05-01. If customer had more than one order on a certain day, sum the order costs on daily basis. Output customer's first name, total cost of their items, and the date.
+For simplicity, you can assume that every first name in the dataset is unique.--
+
+
+select first_name, 
+    cust_id, 
+    sum(total_order_cost) as total_order_cost, 
+    order_date
+from orders o
+left join customers c on cust_id = c.id
+where order_date between '2019-02-01' and '2019-05-01'
+group by first_name, cust_id, order_date
+order by total_order_cost desc
+limit 1
+
+
+
+
