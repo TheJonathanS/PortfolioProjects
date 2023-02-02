@@ -1,0 +1,46 @@
+--How many orders do we have each day?
+select count(distinct order_id) as orders_count, convert(date, date) as order_date
+from orders 
+group by convert(date, date) 
+order by orders_count desc
+
+
+--Are there any peak hours
+select top 12 datepart(hour, time) as order_hour, count(*) as order_count
+from orders
+group by datepart(hour, time)
+order by order_count desc
+
+
+--How many pizzas are typically in an order?
+select avg(quantity) as avg_per_order
+from order_details 
+
+--Do we have any bestsellers?
+select sum(quantity) as amount_ordered, pizza_id
+from order_details
+group by pizza_id
+order by amount_ordered desc
+
+--Pizzas we can look to possibly remove from menu
+select sum(o.quantity) as amount_ordered, o.pizza_id,p.price
+from order_details o
+join pizzas p
+on o.pizza_id = p.pizza_id
+group by o.pizza_id,p.price
+order by amount_ordered 
+ 
+ --Revenue for the year
+with pizza_info(pizza_id, quantity, size, total) as
+(select p.pizza_id, sum(od.quantity) as amount, p.size, sum(p.price) as total
+from order_details od
+join pizzas p
+on od.pizza_id = p.pizza_id
+group by p.pizza_id, p.size
+)
+select sum(total) as total_revenue
+from pizza_info
+
+--Amount of pizzas sold in a year
+select distinct(sum(quantity)) as Pizzas_Sold_In_Year
+from order_details
